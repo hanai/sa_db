@@ -1,0 +1,6 @@
+.python-version
+.vscode
+*.db
+__pycache__
+.idea
+*.log
