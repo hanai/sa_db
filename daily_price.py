@@ -1,34 +1,38 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, Date, Float, Integer, DateTime
 
+from typing import Dict
+
 from .base import Base
 from .engines import engine
+from .mixin import DictSerializableMixin
 
 model_cache = dict()
 
 
 def create_daily_price_model(symbol: str):
-    Model = type(
-        "DailyPriceModel_%s" % symbol,
-        (Base, ),
-        dict(__tablename__='dp_' + symbol.lower(),
-             date=Column(Date, primary_key=True),
-             open=Column(Float),
-             high=Column(Float),
-             low=Column(Float),
-             close=Column(Float),
-             adj_open=Column(Float),
-             adj_high=Column(Float),
-             adj_low=Column(Float),
-             adj_close=Column(Float),
-             volume=Column(Integer),
-             adj_volume=Column(Integer),
-             split_factor=Column(Float),
-             created_at=Column(DateTime, default=datetime.now(timezone.utc)),
-             updated_at=Column(DateTime,
-                               default=datetime.now(timezone.utc),
-                               onupdate=datetime.now(timezone.utc))),
-    )
+    model_dict = dict(__tablename__='dp_' + symbol.lower(),
+                      date=Column(Date, primary_key=True),
+                      open=Column(Float),
+                      high=Column(Float),
+                      low=Column(Float),
+                      close=Column(Float),
+                      adj_open=Column(Float),
+                      adj_high=Column(Float),
+                      adj_low=Column(Float),
+                      adj_close=Column(Float),
+                      volume=Column(Integer),
+                      adj_volume=Column(Integer),
+                      split_factor=Column(Float),
+                      created_at=Column(DateTime,
+                                        default=datetime.now(timezone.utc)),
+                      updated_at=Column(DateTime,
+                                        default=datetime.now(timezone.utc),
+                                        onupdate=datetime.now(timezone.utc)))
+    Model = type("DailyPriceModel_%s" % symbol, (
+        Base,
+        DictSerializableMixin,
+    ), model_dict)
 
     Model.__table__.create(engine, checkfirst=True)
 

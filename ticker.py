@@ -3,9 +3,10 @@ from sqlalchemy import Column, Date, String, DateTime
 
 from .base import Base
 from .engines import engine
+from .mixin import DictSerializableMixin
 
 
-class TickerModel(Base):
+class TickerModel(Base, DictSerializableMixin):
     __tablename__ = 'tickers'
 
     symbol = Column(String, primary_key=True)
